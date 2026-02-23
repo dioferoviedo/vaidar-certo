@@ -4,8 +4,8 @@ metadata:
   name: databricks-proxy-executable
   annotations:
     scenarios.ai.sap.com/description: "Proxy Node.js: AI Core -> Databricks"
-    scenarios.ai.sap.com/name: "Databricks Proxy Scenario"
-    executables.ai.sap.com/description: "Container que repassa chamadas ao Databricks"
+    scenarios.ai.sap.com/name: "ai-container-slc"
+    executables.ai.sap.com/description: "Proxy Node.js: AI Core -> Databricks"
     executables.ai.sap.com/name: "Databricks Proxy"
   labels:
     scenarios.ai.sap.com/id: "scenario-ai"
@@ -14,28 +14,21 @@ spec:
   inputs:
     parameters:
       - name: databricksUrl
-        description: "URL completa do endpoint do Databricks"
       - name: databricksToken
-        description: "Token PAT do Databricks"
   template:
     apiVersion: serving.kserve.io/v1beta1
     kind: Predictor
     metadata:
-      labels:
-        ai.sap.com/resourcePlan: extended
     spec:
-      minReplicas: 1
       containers:
         - name: kserve-container
-          image: docker.io/dioferoviedo/databricks-proxy:latest
+          image: "docker.io/dioferoviedo/databricks-proxy:latest"
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080 # Porta definida no server.js
+            - containerPort: 8080
               protocol: TCP
           env:
             - name: DATABRICKS_URL
               value: "{{inputs.parameters.databricksUrl}}"
             - name: DATABRICKS_TOKEN
               value: "{{inputs.parameters.databricksToken}}"
-            - name: PORT
-              value: "8080"
