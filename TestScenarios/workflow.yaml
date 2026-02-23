@@ -19,8 +19,6 @@ spec:
     apiVersion: serving.kserve.io/v1beta1
     kind: Predictor
     metadata:
-      labels:
-        ai.sap.com/resourcePlan: extended
     spec:
       containers:
         - name: kserve-container
