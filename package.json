@@ -1,0 +1,16 @@
+{
+  "name": "databricks-proxy",
+  "version": "1.0.0",
+  "description": "Container Node que recebe chamadas do AI Core e repassa ao Databricks",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

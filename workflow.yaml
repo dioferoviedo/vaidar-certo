@@ -1,0 +1,32 @@
+
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: databricks-proxy-executable   # ID único do executável
+  annotations:
+    scenarios.ai.sap.com/description: "Container que repassa chamadas ao Databricks"
+    scenarios.ai.sap.com/name: "ai-container-slc"
+    executables.ai.sap.com/description: "Proxy Node.js: AI Core -> Databricks"
+    executables.ai.sap.com/name: "Databricks Proxy"
+  labels:
+    scenarios.ai.sap.com/id: "scenario-ai"
+    ai.sap.com/version: "1.0"
+spec:
+  imagePullSecrets:
+    - name: dockerhub   # mesmo nome do Docker Registry Secret que você criou no AI Core
+  entrypoint: mypipeline
+  templates:
+  - name: mypipeline
+    steps:
+    - - name: mypredictor
+        template: mycodeblock1
+
+  - name: mycodeblock1
+    container:
+
+      image: docker.io/dioferoviedo/databricks-proxy:latest
+
+      resources:
+        limits:
+          memory: "512Mi"
+          cpu: "0.5"
