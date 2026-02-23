@@ -24,3 +24,5 @@ spec:
   - name: mycodeblock1
     container:
       image: docker.io/dioferoviedo/databricks-proxy:latest
+
+      command: ["node", "server.js"]
