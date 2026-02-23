@@ -1,28 +1,41 @@
-
-apiVersion: argoproj.io/v1alpha1
-kind: WorkflowTemplate
+apiVersion: ai.sap.com/v1alpha1
+kind: ServingTemplate
 metadata:
-  name: databricks-proxy-executable   # ID único do executável
+  name: databricks-proxy-executable
   annotations:
-    scenarios.ai.sap.com/description: "Container que repassa chamadas ao Databricks"
-    scenarios.ai.sap.com/name: "ai-container-slc"
-    executables.ai.sap.com/description: "Proxy Node.js: AI Core -> Databricks"
+    scenarios.ai.sap.com/description: "Proxy Node.js: AI Core -> Databricks"
+    scenarios.ai.sap.com/name: "Databricks Proxy Scenario"
+    executables.ai.sap.com/description: "Container que repassa chamadas ao Databricks"
     executables.ai.sap.com/name: "Databricks Proxy"
   labels:
     scenarios.ai.sap.com/id: "scenario-ai"
     ai.sap.com/version: "2.0"
 spec:
-  imagePullSecrets:
-    - name: dockerhub   # mesmo nome do Docker Registry Secret que você criou no AI Core
-  entrypoint: mypipeline
-  templates:
-  - name: mypipeline
-    steps:
-    - - name: mypredictor
-        template: mycodeblock1
-
-  - name: mycodeblock1
-    container:
-      image: docker.io/dioferoviedo/databricks-proxy:latest
-
-      command: ["node", "server.js"]
+  inputs:
+    parameters:
+      - name: databricksUrl
+        description: "URL completa do endpoint do Databricks"
+      - name: databricksToken
+        description: "Token PAT do Databricks"
+  template:
+    apiVersion: serving.kserve.io/v1beta1
+    kind: Predictor
+    metadata:
+      labels:
+        ai.sap.com/resourcePlan: extended
+    spec:
+      minReplicas: 1
+      containers:
+        - name: kserve-container
+          image: docker.io/dioferoviedo/databricks-proxy:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080 # Porta definida no server.js
+              protocol: TCP
+          env:
+            - name: DATABRICKS_URL
+              value: "{{inputs.parameters.databricksUrl}}"
+            - name: DATABRICKS_TOKEN
+              value: "{{inputs.parameters.databricksToken}}"
+            - name: PORT
+              value: "8080"
